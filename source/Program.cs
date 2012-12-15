@@ -23,18 +23,23 @@ namespace RenameRegex
         /// <returns>0 on success</returns>
         public static int Main(string[] args)
         {
+            // get command-line arguments
             string nameSearch;
             string nameReplace;
             string fileMatch;
+            bool recursive;
             bool pretend;
-            if (!GetArguments(args, out fileMatch, out nameSearch, out nameReplace, out pretend))
+            if (!GetArguments(args, out fileMatch, out nameSearch, out nameReplace, out pretend, out recursive))
             {
                 Usage();
                 return 1;
             }
 
             // enumerate all files
-            string[] files = Directory.GetFiles(System.Environment.CurrentDirectory, fileMatch);
+            string[] files = Directory.GetFiles(
+                System.Environment.CurrentDirectory, 
+                fileMatch, 
+                recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
             if (files.Length == 0)
             {
@@ -59,7 +64,12 @@ namespace RenameRegex
                 // write what we changed (or would have)
                 if (fileName != fileNameAfter)
                 {
-                    Console.WriteLine(@"{0} -> {1}{2}", fileName, fileNameAfter, pretendModeNotification);
+                    // show the relative file path if not the current directory
+                    string fileNameToShow = (System.Environment.CurrentDirectory == fileDir) ?
+                        fileName :
+                        (fileDir + @"\" + fileName).Replace(System.Environment.CurrentDirectory + @"\", String.Empty);
+
+                    Console.WriteLine(@"{0} -> {1}{2}", fileNameToShow, fileNameAfter, pretendModeNotification);
                 }
 
                 // move file
@@ -89,20 +99,22 @@ namespace RenameRegex
         /// <param name="pretend">Whether or not to only show what would happen</param>
         /// <returns>True if argument parsing was successful</returns>
         private static bool GetArguments(
-            string[] args, 
-            out string fileMatch, 
-            out string nameSearch, 
-            out string nameReplace, 
-            out bool pretend)
+            string[] args,
+            out string fileMatch,
+            out string nameSearch,
+            out string nameReplace,
+            out bool pretend,
+            out bool recursive)
         {
             // defaults
             fileMatch   = String.Empty;
             nameSearch  = String.Empty;
             nameReplace = String.Empty;
             pretend     = false;
+            recursive   = false;
 
             // check for all arguments
-            if (args == null || args.Length < 3 || args.Length > 4)
+            if (args == null || args.Length < 3)
             {
                 return false;
             }
@@ -113,9 +125,22 @@ namespace RenameRegex
             nameReplace = args[2];
             pretend     = false;
 
-            if (args.Length == 4 && args[3].Equals("/p", StringComparison.OrdinalIgnoreCase))
+            //
+            // Optional arguments:
+            //  /p: pretend (show what will be renamed)
+            //  /r: recursive
+            //
+            for (int i = 3; i < args.Length; i++)
             {
-                pretend = true;
+                if (args[i].Equals("/p", StringComparison.OrdinalIgnoreCase))
+                {
+                    pretend = true;
+                }
+
+                if (args[i].Equals("/r", StringComparison.OrdinalIgnoreCase))
+                {
+                    recursive = true;
+                }
             }
 
             return true;
@@ -127,14 +152,15 @@ namespace RenameRegex
         private static void Usage()
         {
             // get the assembly version
-            Assembly assembly = Assembly.GetExecutingAssembly(); 
-            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location); 
-            string version = fvi.ProductVersion; 
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            string version = fvi.ProductVersion;
 
             Console.WriteLine(@"Rename Regex (RR) v{0} by Nic Jansma, http://nicj.net", version);
             Console.WriteLine();
-            Console.WriteLine(@"Usage: RR file-match search replace [/p]");
+            Console.WriteLine(@"Usage: RR.exe file-match search replace [/p] [/r]");
             Console.WriteLine(@"        /p: pretend (show what will be renamed)");
+            Console.WriteLine(@"        /r: recursive");
             return;
         }
     }

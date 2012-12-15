@@ -10,8 +10,9 @@ file renamer or with a complex regular expression for matching and replacement. 
 Usage
 ------------
 
-    RR.exe file-match search replace [/p]
+    RR.exe file-match search replace [/p] [/r]
      /p: pretend (show what will be renamed)
+     /r: recursive
 
 You can use [.NET regular expressions](http://msdn.microsoft.com/en-us/library/hs600312.aspx) for the search and 
 replacement strings, including [substitutions](http://msdn.microsoft.com/en-us/library/ewy2t5e0.aspx) (for example, 
