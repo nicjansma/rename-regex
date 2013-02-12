@@ -1,14 +1,12 @@
-﻿Copyright (c) 2012 Nic Jansma
+﻿Copyright (c) 2013 Nic Jansma
 [http://nicj.net](http://nicj.net)
 
-Introduction
-------------
+# Introduction
 
 RenameRegex (RR) is a Windows command-line bulk file renamer, using regular expressions.  You can use it as a simple
 file renamer or with a complex regular expression for matching and replacement.  See the Examples section for details.
 
-Usage
-------------
+# Usage
 
     RR.exe file-match search replace [/p] [/r]
      /p: pretend (show what will be renamed)
@@ -18,8 +16,7 @@ You can use [.NET regular expressions](http://msdn.microsoft.com/en-us/library/h
 replacement strings, including [substitutions](http://msdn.microsoft.com/en-us/library/ewy2t5e0.aspx) (for example, 
 "$1" is the 1st capture group in the search term).
      
-Examples
-------------
+# Examples
 
 Simple rename without a regular expression:
 
@@ -37,10 +34,11 @@ Rename files in the pattern of "````124_xyz.txt````" to "````xyz_123.txt````":
 
     RR.exe *.txt "([0-9]+)_([a-z]+)" "$2_$1"
 
-Version History
----------------
-v1.0 - 2012-01-30: Initial release
+# Version History
 
-Credits
--------
+* v1.0 - 2012-01-30: Initial release
+* v1.1 - 2012-12-15: Added /r option
+
+# Credits
+
 Nic Jansma (http://nicj.net)
