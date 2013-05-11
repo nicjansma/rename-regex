@@ -1,5 +1,5 @@
 // <copyright file="Program.cs" company="Nic Jansma">
-//  Copyright (c) Nic Jansma 2012 All Right Reserved
+//  Copyright (c) Nic Jansma 2013 All Right Reserved
 // </copyright>
 // <author>Nic Jansma</author>
 // <email>nic@nicj.net</email>
@@ -53,7 +53,7 @@ namespace RenameRegex
             // loop through each file, renaming via a regex
             //
             foreach (string fullFile in files)
-            {                
+            {
                 // split into file and path
                 string fileName = Path.GetFileName(fullFile);
                 string fileDir  = Path.GetDirectoryName(fullFile);
@@ -97,6 +97,7 @@ namespace RenameRegex
         /// <param name="nameSearch">Search expression</param>
         /// <param name="nameReplace">Replace expression</param>
         /// <param name="pretend">Whether or not to only show what would happen</param>
+        /// <param name="recursive">Whether or not to recursively look in directories</param>
         /// <returns>True if argument parsing was successful</returns>
         private static bool GetArguments(
             string[] args,
@@ -119,31 +120,46 @@ namespace RenameRegex
                 return false;
             }
 
-            // set from arguments
-            fileMatch   = args[0];
-            nameSearch  = args[1];
-            nameReplace = args[2];
-            pretend     = false;
-
             //
-            // Optional arguments:
+            // Loop through all of the command line arguments.
+            //
+            // Look for options first:
             //  /p: pretend (show what will be renamed)
             //  /r: recursive
             //
-            for (int i = 3; i < args.Length; i++)
+            // If not an option, assume it's one of the three main arguments (filename, search, replace)
+            //
+            for (int i = 0; i < args.Length; i++)
             {
                 if (args[i].Equals("/p", StringComparison.OrdinalIgnoreCase))
                 {
                     pretend = true;
                 }
-
-                if (args[i].Equals("/r", StringComparison.OrdinalIgnoreCase))
+                else if (args[i].Equals("/r", StringComparison.OrdinalIgnoreCase))
                 {
                     recursive = true;
                 }
+                else
+                {
+                    // if not an option, the rest of the arguments are filename, search, replace
+                    if (String.IsNullOrEmpty(fileMatch))
+                    {
+                        fileMatch = args[i];
+                    }
+                    else if (String.IsNullOrEmpty(nameSearch))
+                    {
+                        nameSearch = args[i];
+                    }
+                    else if (String.IsNullOrEmpty(nameReplace))
+                    {
+                        nameReplace = args[i];
+                    }
+                }
             }
 
-            return true;
+            return !String.IsNullOrEmpty(fileMatch)
+                && !String.IsNullOrEmpty(nameSearch)
+                && !String.IsNullOrEmpty(nameReplace);
         }
 
         /// <summary>

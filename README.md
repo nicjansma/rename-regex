@@ -38,6 +38,7 @@ Rename files in the pattern of "````124_xyz.txt````" to "````xyz_123.txt````":
 
 * v1.0 - 2012-01-30: Initial release
 * v1.1 - 2012-12-15: Added /r option
+* v1.2 - 2013-05-11: Allow /p and /r options before or after main arguments
 
 # Credits
 
