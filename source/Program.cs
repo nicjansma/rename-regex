@@ -111,6 +111,9 @@ namespace RenameRegex
             fileMatch   = String.Empty;
             nameSearch  = String.Empty;
             nameReplace = String.Empty;
+
+            bool foundNameReplace = false;
+
             pretend     = false;
             recursive   = false;
 
@@ -153,13 +156,14 @@ namespace RenameRegex
                     else if (String.IsNullOrEmpty(nameReplace))
                     {
                         nameReplace = args[i];
+                        foundNameReplace = true;
                     }
                 }
             }
 
             return !String.IsNullOrEmpty(fileMatch)
                 && !String.IsNullOrEmpty(nameSearch)
-                && !String.IsNullOrEmpty(nameReplace);
+                && foundNameReplace;
         }
 
         /// <summary>
