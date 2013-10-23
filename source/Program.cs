@@ -29,7 +29,9 @@ namespace RenameRegex
             string fileMatch;
             bool recursive;
             bool pretend;
-            if (!GetArguments(args, out fileMatch, out nameSearch, out nameReplace, out pretend, out recursive))
+            bool force;
+
+            if (!GetArguments(args, out fileMatch, out nameSearch, out nameReplace, out pretend, out recursive, out force))
             {
                 Usage();
                 return 1;
@@ -61,6 +63,8 @@ namespace RenameRegex
                 // rename via a regex
                 string fileNameAfter = Regex.Replace(fileName, nameSearch, nameReplace, RegexOptions.IgnoreCase);
 
+                bool newFileAlreadyExists = File.Exists(fileNameAfter);
+
                 // write what we changed (or would have)
                 if (fileName != fileNameAfter)
                 {
@@ -69,7 +73,12 @@ namespace RenameRegex
                         fileName :
                         (fileDir + @"\" + fileName).Replace(System.Environment.CurrentDirectory + @"\", String.Empty);
 
-                    Console.WriteLine(@"{0} -> {1}{2}", fileNameToShow, fileNameAfter, pretendModeNotification);
+                    Console.WriteLine(
+                        @"{0} -> {1}{2}{3}", 
+                        fileNameToShow, 
+                        fileNameAfter, 
+                        pretendModeNotification,
+                        newFileAlreadyExists ? @" (already exists)" : "");
                 }
 
                 // move file
@@ -77,11 +86,17 @@ namespace RenameRegex
                 {
                     try
                     {
+                        if (newFileAlreadyExists && force)
+                        {
+                            // remove old file on force overwrite
+                            File.Delete(fileNameAfter);
+                        }
+
                         File.Move(fileDir + @"\" + fileName, fileDir + @"\" + fileNameAfter);
                     }
                     catch (IOException)
                     {
-                        Console.WriteLine(@"WARNING: Could note move {0} to {1}", fileName, fileNameAfter);
+                        Console.WriteLine(@"WARNING: Could not move {0} to {1}", fileName, fileNameAfter);
                     }
                 }
             }
@@ -98,6 +113,7 @@ namespace RenameRegex
         /// <param name="nameReplace">Replace expression</param>
         /// <param name="pretend">Whether or not to only show what would happen</param>
         /// <param name="recursive">Whether or not to recursively look in directories</param>
+        /// <param name="force">Whether or not to force overwrites</param>
         /// <returns>True if argument parsing was successful</returns>
         private static bool GetArguments(
             string[] args,
@@ -105,7 +121,8 @@ namespace RenameRegex
             out string nameSearch,
             out string nameReplace,
             out bool pretend,
-            out bool recursive)
+            out bool recursive,
+            out bool force)
         {
             // defaults
             fileMatch   = String.Empty;
@@ -116,6 +133,7 @@ namespace RenameRegex
 
             pretend     = false;
             recursive   = false;
+            force       = false;
 
             // check for all arguments
             if (args == null || args.Length < 3)
@@ -141,6 +159,10 @@ namespace RenameRegex
                 else if (args[i].Equals("/r", StringComparison.OrdinalIgnoreCase))
                 {
                     recursive = true;
+                }
+                else if (args[i].Equals("/f", StringComparison.OrdinalIgnoreCase))
+                {
+                    force = true;
                 }
                 else
                 {
@@ -178,9 +200,10 @@ namespace RenameRegex
 
             Console.WriteLine(@"Rename Regex (RR) v{0} by Nic Jansma, http://nicj.net", version);
             Console.WriteLine();
-            Console.WriteLine(@"Usage: RR.exe file-match search replace [/p] [/r]");
+            Console.WriteLine(@"Usage: RR.exe file-match search replace [/p] [/r] [/f]");
             Console.WriteLine(@"        /p: pretend (show what will be renamed)");
             Console.WriteLine(@"        /r: recursive");
+            Console.WriteLine(@"        /f: force overwrite if the file already exists");
             return;
         }
     }

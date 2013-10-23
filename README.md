@@ -8,9 +8,10 @@ file renamer or with a complex regular expression for matching and replacement. 
 
 # Usage
 
-    RR.exe file-match search replace [/p] [/r]
+    RR.exe file-match search replace [/p] [/r] [/f]
      /p: pretend (show what will be renamed)
      /r: recursive
+     /f: force overwrite if the file already exists
 
 You can use [.NET regular expressions](http://msdn.microsoft.com/en-us/library/hs600312.aspx) for the search and 
 replacement strings, including [substitutions](http://msdn.microsoft.com/en-us/library/ewy2t5e0.aspx) (for example, 
@@ -39,6 +40,7 @@ Rename files in the pattern of "````124_xyz.txt````" to "````xyz_123.txt````":
 * v1.0 - 2012-01-30: Initial release
 * v1.1 - 2012-12-15: Added /r option
 * v1.2 - 2013-05-11: Allow /p and /r options before or after main arguments
+* v1.3 - 2013-10-23: Added /f option
 
 # Credits
 
