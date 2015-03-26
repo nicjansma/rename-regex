@@ -78,7 +78,7 @@ namespace RenameRegex
                         fileNameToShow, 
                         fileNameAfter, 
                         pretendModeNotification,
-                        newFileAlreadyExists ? @" (already exists)" : "");
+                        newFileAlreadyExists ? @" (already exists)" : String.Empty);
                 }
 
                 // move file
@@ -191,6 +191,7 @@ namespace RenameRegex
         /// <summary>
         /// Program usage
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly")]
         private static void Usage()
         {
             // get the assembly version
