@@ -30,8 +30,10 @@ namespace RenameRegex
             bool recursive;
             bool pretend;
             bool force;
+            bool preserveExt;
 
-            if (!GetArguments(args, out fileMatch, out nameSearch, out nameReplace, out pretend, out recursive, out force))
+            if (!GetArguments(args, out fileMatch, out nameSearch, out nameReplace,
+                out pretend, out recursive, out force, out preserveExt))
             {
                 Usage();
                 return 1;
@@ -39,8 +41,8 @@ namespace RenameRegex
 
             // enumerate all files
             string[] files = Directory.GetFiles(
-                System.Environment.CurrentDirectory, 
-                fileMatch, 
+                System.Environment.CurrentDirectory,
+                fileMatch,
                 recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
             if (files.Length == 0)
@@ -56,14 +58,30 @@ namespace RenameRegex
             //
             foreach (string fullFile in files)
             {
-                // split into file and path
-                string fileName = Path.GetFileName(fullFile);
+                // split into filename, extension and path
+                string fileName = Path.GetFileNameWithoutExtension(fullFile);
+                string fileExt  = Path.GetExtension(fullFile);
                 string fileDir  = Path.GetDirectoryName(fullFile);
+
+                if (!preserveExt)
+                {
+                    // if file extension should NOT be preserverd
+                    // append extension to filename BEFORE renaming
+                    fileName += fileExt;
+                }
 
                 // rename via a regex
                 string fileNameAfter = Regex.Replace(fileName, nameSearch, nameReplace, RegexOptions.IgnoreCase);
 
-                bool newFileAlreadyExists = File.Exists(fileNameAfter);
+                if (preserveExt)
+                {
+                    // if file extension SHOULD be preserved
+                    // append extension to filenames AFTER renaming
+                    fileName += fileExt;
+                    fileNameAfter += fileExt;
+                }
+
+                bool newFileAlreadyExists = File.Exists(fileDir + @"\" + fileNameAfter);
 
                 // write what we changed (or would have)
                 if (fileName != fileNameAfter)
@@ -74,9 +92,9 @@ namespace RenameRegex
                         (fileDir + @"\" + fileName).Replace(System.Environment.CurrentDirectory + @"\", String.Empty);
 
                     Console.WriteLine(
-                        @"{0} -> {1}{2}{3}", 
-                        fileNameToShow, 
-                        fileNameAfter, 
+                        @"{0} -> {1}{2}{3}",
+                        fileNameToShow,
+                        fileNameAfter,
                         pretendModeNotification,
                         newFileAlreadyExists ? @" (already exists)" : String.Empty);
                 }
@@ -114,6 +132,7 @@ namespace RenameRegex
         /// <param name="pretend">Whether or not to only show what would happen</param>
         /// <param name="recursive">Whether or not to recursively look in directories</param>
         /// <param name="force">Whether or not to force overwrites</param>
+        /// <param name="preserveExt">Whether or not to preserve file extensions</param>
         /// <returns>True if argument parsing was successful</returns>
         private static bool GetArguments(
             string[] args,
@@ -122,7 +141,8 @@ namespace RenameRegex
             out string nameReplace,
             out bool pretend,
             out bool recursive,
-            out bool force)
+            out bool force,
+            out bool preserveExt)
         {
             // defaults
             fileMatch   = String.Empty;
@@ -134,6 +154,7 @@ namespace RenameRegex
             pretend     = false;
             recursive   = false;
             force       = false;
+            preserveExt = false;
 
             // check for all arguments
             if (args == null || args.Length < 3)
@@ -163,6 +184,10 @@ namespace RenameRegex
                 else if (args[i].Equals("/f", StringComparison.OrdinalIgnoreCase))
                 {
                     force = true;
+                }
+                else if (args[i].Equals("/e", StringComparison.OrdinalIgnoreCase))
+                {
+                    preserveExt = true;
                 }
                 else
                 {
@@ -201,10 +226,11 @@ namespace RenameRegex
 
             Console.WriteLine(@"Rename Regex (RR) v{0} by Nic Jansma, http://nicj.net", version);
             Console.WriteLine();
-            Console.WriteLine(@"Usage: RR.exe file-match search replace [/p] [/r] [/f]");
+            Console.WriteLine(@"Usage: RR.exe file-match search replace [/p] [/r] [/f] [/e]");
             Console.WriteLine(@"        /p: pretend (show what will be renamed)");
             Console.WriteLine(@"        /r: recursive");
             Console.WriteLine(@"        /f: force overwrite if the file already exists");
+            Console.WriteLine(@"        /e: preserve file extensions");
             return;
         }
     }
