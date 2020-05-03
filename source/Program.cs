@@ -32,8 +32,15 @@ namespace RenameRegex
             bool force;
             bool preserveExt;
 
-            if (!GetArguments(args, out fileMatch, out nameSearch, out nameReplace,
-                out pretend, out recursive, out force, out preserveExt))
+            if (!GetArguments(
+                    args,
+                    out fileMatch,
+                    out nameSearch,
+                    out nameReplace,
+                    out pretend,
+                    out recursive,
+                    out force,
+                    out preserveExt))
             {
                 Usage();
                 return 1;
