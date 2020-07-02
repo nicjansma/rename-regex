@@ -17,6 +17,7 @@ namespace RenameRegex
     /// </summary>
     public static class Program
     {
+        const int MAX_PATH = 260;
         public const int incFiles=1;
         public const int incDirs=2;
 
@@ -81,11 +82,15 @@ namespace RenameRegex
             //
             foreach (string fullFile in allItems)
             {
+                if (fullFile.Length > MAX_PATH || Path.GetDirectoryName(fullFile).Length > MAX_PATH-12) {
+                    Console.WriteLine(@"""{0}"" cannot be accessed; too long.", fullFile);
+                    continue;
+                }
+
                 // split into filename, extension and path
                 string fileName = Path.GetFileNameWithoutExtension(fullFile);
                 string fileExt  = Path.GetExtension(fullFile);
                 string fileDir  = Path.GetDirectoryName(fullFile);
-//Console.WriteLine(@"filename: {0}", fileName);
 
                 if (!preserveExt)
                 {
@@ -95,7 +100,7 @@ namespace RenameRegex
                 }
 
                 // rename via a regex
-                string fileNameAfter = Regex.Replace(fileName, nameSearch, nameReplace, RegexOptions.IgnoreCase);
+                string fileNameAfter = Regex.Replace(fileName, nameSearch, nameReplace);
 
                 if (preserveExt)
                 {
@@ -116,7 +121,7 @@ namespace RenameRegex
                         (fileDir + @"\" + fileName).Replace(System.Environment.CurrentDirectory + @"\", String.Empty);
 
                     Console.WriteLine(
-                        @"{0} -> {1}{2}{3}",
+                        @"{0} -> " + Environment.NewLine + "{1}{2}{3}" + Environment.NewLine,
                         fileNameToShow,
                         fileNameAfter,
                         pretendModeNotification,
