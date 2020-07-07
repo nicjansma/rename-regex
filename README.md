@@ -8,14 +8,15 @@ file renamer or with a complex regular expression for matching and replacement. 
 
 # Usage
 
-    RR.exe file-match search replace [/p] [/r] [/f] [/e]
-     /p: pretend (show what will be renamed)
-     /r: recursive
-  /q|/y: force overwrite if the file already exists
-     /e: preserve file extensions
-     /f: include only files
-     /d: include only directories
-         default is to include files and folders
+    RR.exe file-match search replace [/p] [/r] [/q|/y] [/e] [/f] [/d]
+        /p: pretend (show what will be renamed)
+        /r: recursive
+     /q|/y: force overwrite if the file already exists
+        /e: preserve file extensions
+        /f: include only files
+        /d: include only directories
+            default is to include files and folders
+
 
 You can use [.NET regular expressions](http://msdn.microsoft.com/en-us/library/hs600312.aspx) for the search and
 replacement strings, including [substitutions](http://msdn.microsoft.com/en-us/library/ewy2t5e0.aspx) (for example,
