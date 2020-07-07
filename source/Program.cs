@@ -140,11 +140,11 @@ namespace RenameRegex
                         }
 
                         if (File.Exists(fileName))
-													File.Move(fileDir + @"\" + fileName, fileDir + @"\" + fileNameAfter);
-												else if (Directory.Exists(fileName))
-													Directory.Move(fileDir + @"\" + fileName, fileDir + @"\" + fileNameAfter);
-												else
-													Console.WriteLine(@"Could not rename {0}.",  fileName);
+                          File.Move(fileDir + @"\" + fileName, fileDir + @"\" + fileNameAfter);
+                        else if (Directory.Exists(fileName))
+                          Directory.Move(fileDir + @"\" + fileName, fileDir + @"\" + fileNameAfter);
+                        else
+                          Console.WriteLine(@"Could not rename {0}.",  fileName);
                     }
                     catch (IOException)
                     {
