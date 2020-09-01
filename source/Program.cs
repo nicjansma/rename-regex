@@ -1,11 +1,12 @@
 // <copyright file="Program.cs" company="Nic Jansma">
-//  Copyright (c) Nic Jansma 2013 All Right Reserved
+//  Copyright (c) Nic Jansma 2020 All Right Reserved
 // </copyright>
 // <author>Nic Jansma</author>
 // <email>nic@nicj.net</email>
 namespace RenameRegex
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
@@ -16,6 +17,21 @@ namespace RenameRegex
     /// </summary>
     public static class Program
     {
+        /// <summary>
+        /// Maximum Windows / DOS path length
+        /// </summary>
+        public const int MaxPath = 260;
+
+        /// <summary>
+        /// Include files
+        /// </summary>
+        public const int IncludeFiles = 1;
+
+        /// <summary>
+        /// Include directories
+        /// </summary>
+        public const int IncludeDirs = 2;
+
         /// <summary>
         /// Main command line
         /// </summary>
@@ -31,6 +47,7 @@ namespace RenameRegex
             bool pretend;
             bool force;
             bool preserveExt;
+            int  includeMask;
 
             if (!GetArguments(
                     args,
@@ -40,21 +57,43 @@ namespace RenameRegex
                     out pretend,
                     out recursive,
                     out force,
-                    out preserveExt))
+                    out preserveExt,
+                    out includeMask))
             {
                 Usage();
+
                 return 1;
             }
 
-            // enumerate all files
-            string[] files = Directory.GetFiles(
-                System.Environment.CurrentDirectory,
-                fileMatch,
-                recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+            // enumerate all files and directories
+            List<string> allItems = new List<string>();
 
-            if (files.Length == 0)
+            // include all files by default
+            if ((includeMask == 0) || ((includeMask & IncludeFiles) != 0))
             {
-                Console.WriteLine(@"No files match!");
+                string[] files = Directory.GetFiles(
+                    Environment.CurrentDirectory,
+                    fileMatch,
+                    recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+
+                allItems.AddRange(files);
+            }
+
+            // include all directories if requested
+            if ((includeMask & IncludeDirs) != 0)
+            {
+                string[] dirs = Directory.GetDirectories(
+                    Environment.CurrentDirectory,
+                    fileMatch,
+                    recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+
+                allItems.AddRange(dirs);
+            }
+    
+            if (allItems.Count == 0)
+            {
+                Console.WriteLine(@"No files or directories match!");
+
                 return 1;
             }
 
@@ -63,8 +102,14 @@ namespace RenameRegex
             //
             // loop through each file, renaming via a regex
             //
-            foreach (string fullFile in files)
+            foreach (string fullFile in allItems)
             {
+                if (fullFile.Length > MaxPath || Path.GetDirectoryName(fullFile).Length > MaxPath - 12)
+                {
+                    Console.WriteLine(@"""{0}"" cannot be accessed; too long.", fullFile);
+                    continue;
+                }
+
                 // split into filename, extension and path
                 string fileName = Path.GetFileNameWithoutExtension(fullFile);
                 string fileExt  = Path.GetExtension(fullFile);
@@ -117,7 +162,18 @@ namespace RenameRegex
                             File.Delete(fileNameAfter);
                         }
 
-                        File.Move(fileDir + @"\" + fileName, fileDir + @"\" + fileNameAfter);
+                        if (File.Exists(fileName))
+                        {
+                            File.Move(fileDir + @"\" + fileName, fileDir + @"\" + fileNameAfter);
+                        }
+                        else if (Directory.Exists(fileName))
+                        {
+                            Directory.Move(fileDir + @"\" + fileName, fileDir + @"\" + fileNameAfter);
+                        }
+                        else
+                        {
+                            Console.WriteLine(@"Could not rename {0}",  fileName);
+                        }
                     }
                     catch (IOException)
                     {
@@ -140,6 +196,7 @@ namespace RenameRegex
         /// <param name="recursive">Whether or not to recursively look in directories</param>
         /// <param name="force">Whether or not to force overwrites</param>
         /// <param name="preserveExt">Whether or not to preserve file extensions</param>
+        /// <param name="includeMask">Whether to include directories, files or both</param>
         /// <returns>True if argument parsing was successful</returns>
         private static bool GetArguments(
             string[] args,
@@ -149,7 +206,8 @@ namespace RenameRegex
             out bool pretend,
             out bool recursive,
             out bool force,
-            out bool preserveExt)
+            out bool preserveExt,
+            out int  includeMask)
         {
             // defaults
             fileMatch   = String.Empty;
@@ -162,6 +220,7 @@ namespace RenameRegex
             recursive   = false;
             force       = false;
             preserveExt = false;
+            includeMask = 0;
 
             // check for all arguments
             if (args == null || args.Length < 3)
@@ -195,6 +254,14 @@ namespace RenameRegex
                 else if (args[i].Equals("/e", StringComparison.OrdinalIgnoreCase))
                 {
                     preserveExt = true;
+                }
+                else if (args[i].Equals("/files", StringComparison.OrdinalIgnoreCase))
+                {
+                    includeMask |= IncludeFiles;
+                }
+                else if (args[i].Equals("/dirs", StringComparison.OrdinalIgnoreCase))
+                {
+                    includeMask |= IncludeDirs;
                 }
                 else
                 {
@@ -233,11 +300,14 @@ namespace RenameRegex
 
             Console.WriteLine(@"Rename Regex (RR) v{0} by Nic Jansma, http://nicj.net", version);
             Console.WriteLine();
-            Console.WriteLine(@"Usage: RR.exe file-match search replace [/p] [/r] [/f] [/e]");
+            Console.WriteLine(@"Usage: RR.exe file-match search replace [/p] [/r] [/f] [/e] [/files] [/dirs]");
             Console.WriteLine(@"        /p: pretend (show what will be renamed)");
             Console.WriteLine(@"        /r: recursive");
             Console.WriteLine(@"        /f: force overwrite if the file already exists");
             Console.WriteLine(@"        /e: preserve file extensions");
+            Console.WriteLine(@"    /files: include files (default)");
+            Console.WriteLine(@"     /dirs: include directories");
+            Console.WriteLine(@"            (default is to include files only, to include both use /files /dirs)");
             return;
         }
     }

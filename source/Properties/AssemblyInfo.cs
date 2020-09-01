@@ -1,5 +1,5 @@
-﻿// <copyright file="AssemblyInfo.cs" company="Nic Jansma">
-//  Copyright (c) Nic Jansma 2013 All Right Reserved
+// <copyright file="AssemblyInfo.cs" company="Nic Jansma">
+//  Copyright (c) Nic Jansma 2020 All Right Reserved
 // </copyright>
 // <author>Nic Jansma</author>
 // <email>nic@nicj.net</email>
@@ -12,11 +12,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("RenameRegex")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Use regular-expressions to rename files and directories from the command-line")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("RenameRegex")]
-[assembly: AssemblyCopyright("Copyright © Nic Jansma 2013")]
+[assembly: AssemblyCopyright("Copyright © Nic Jansma 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -35,7 +35,7 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.4.0.0")]
-[assembly: AssemblyFileVersion("1.4.0.0")]
+[assembly: AssemblyVersion("1.5.0.0")]
+[assembly: AssemblyFileVersion("1.5.0.0")]
 
 [assembly: CLSCompliant(true)]
