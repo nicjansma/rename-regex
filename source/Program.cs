@@ -316,7 +316,7 @@ namespace RenameRegex
 
             Console.WriteLine(@"Rename Regex (RR) v{0} by Nic Jansma, http://nicj.net", version);
             Console.WriteLine();
-            Console.WriteLine(@"Usage: RR.exe file-match search replace [/p] [/r] [/f] [/e] [/files] [/dirs]");
+            Console.WriteLine(@"Usage: RR.exe file-match search replace [/p] [/r] [/c] [/f] [/e] [/files] [/dirs]");
             Console.WriteLine(@"        /p: pretend (show what will be renamed)");
             Console.WriteLine(@"        /r: recursive");
             Console.WriteLine(@"        /c: case insensitive");
