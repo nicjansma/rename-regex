@@ -1,5 +1,5 @@
 // <copyright file="Program.cs" company="Nic Jansma">
-//  Copyright (c) Nic Jansma 2020 All Right Reserved
+//  Copyright (c) Nic Jansma 2021 All Right Reserved
 // </copyright>
 // <author>Nic Jansma</author>
 // <email>nic@nicj.net</email>

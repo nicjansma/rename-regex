@@ -1,4 +1,4 @@
-Copyright (c) 2020 Nic Jansma
+Copyright (c) 2021 Nic Jansma
 [http://nicj.net](http://nicj.net)
 
 # Introduction
@@ -57,6 +57,7 @@ Rename files and directories
 * v1.3 - 2013-10-23: Added /f option
 * v1.4 - 2018-04-06: Added /e option (via Marcel Peeters)
 * v1.5 - 2020-07-02: Added support for directories, added length-check (via Alec S. @Synetech)
+* v1.6 - 2021-05-22: Added /i support for case insensitivity (via Alec S. @Synetech)
 
 # Credits
 
