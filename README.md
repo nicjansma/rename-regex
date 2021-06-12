@@ -59,6 +59,7 @@ Rename files and directories
 * v1.4 - 2018-04-06: Added `/e` option (via Marcel Peeters)
 * v1.5 - 2020-07-02: Added support for directories, added length-check (via Alec S. @Synetech)
 * v1.6 - 2021-05-22: Added `/c` support for case insensitivity (via Alec S. @Synetech)
+* v1.6.1 - 2021-06-12: Fix `/r` for sub-dirs
 
 # Credits
 

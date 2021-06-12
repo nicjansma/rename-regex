@@ -172,11 +172,11 @@ namespace RenameRegex
                             File.Delete(fileNameAfter);
                         }
 
-                        if (File.Exists(fileName))
+                        if (File.Exists(fileDir + @"\" + fileName))
                         {
                             File.Move(fileDir + @"\" + fileName, fileDir + @"\" + fileNameAfter);
                         }
-                        else if (Directory.Exists(fileName))
+                        else if (Directory.Exists(fileDir + @"\" + fileName))
                         {
                             Directory.Move(fileDir + @"\" + fileName, fileDir + @"\" + fileNameAfter);
                         }
