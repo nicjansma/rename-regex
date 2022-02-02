@@ -1,4 +1,4 @@
-Copyright (c) 2021 Nic Jansma
+Copyright (c) 2022 Nic Jansma
 [http://nicj.net](http://nicj.net)
 
 # Introduction
@@ -18,6 +18,7 @@ file renamer or with a complex regular expression for matching and replacement. 
     /files: include only files
      /dirs: include only directories
             (default is to include files only, to include both use /files /dirs)
+       /fr: use regex for file name matching instead of Windows glob matching
 ```
 
 You can use [.NET regular expressions](http://msdn.microsoft.com/en-us/library/hs600312.aspx) for the search and
@@ -42,13 +43,17 @@ Rename files in the pattern of "`124_xyz.txt`" to "`xyz_123.txt`":
 
     RR.exe *.txt "([0-9]+)_([a-z]+)" "$2_$1"
 
-Rename directories (only)
+Rename directories (only):
 
     RR * "-" "_" /dirs
 
-Rename files and directories
+Rename files and directories:
 
     RR * "-" "_" /files /dirs
+
+Apply a regular expression to the glob pattern files and directories:
+
+    RR a_\d.txt "a_" "a_0" /fr
 
 # Version History
 
@@ -60,6 +65,7 @@ Rename files and directories
 * v1.5 - 2020-07-02: Added support for directories, added length-check (via Alec S. @Synetech)
 * v1.6 - 2021-05-22: Added `/c` support for case insensitivity (via Alec S. @Synetech)
 * v1.6.1 - 2021-06-12: Fix `/r` for sub-dirs
+* v1.7- 2022-02-01: Added `/fr` option to apply a regex to file matches (instead of Windows glob pattern)
 
 # Credits
 

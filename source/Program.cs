@@ -49,6 +49,7 @@ namespace RenameRegex
             bool force;
             bool preserveExt;
             int  includeMask;
+            bool fileMatchRegEx;
 
             if (!GetArguments(
                     args,
@@ -60,7 +61,8 @@ namespace RenameRegex
                     out caseInsensitive,
                     out force,
                     out preserveExt,
-                    out includeMask))
+                    out includeMask,
+                    out fileMatchRegEx))
             {
                 Usage();
 
@@ -75,8 +77,13 @@ namespace RenameRegex
             {
                 string[] files = Directory.GetFiles(
                     Environment.CurrentDirectory,
-                    fileMatch,
+                    fileMatchRegEx ? "*" : fileMatch,
                     recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+
+                if (fileMatchRegEx)
+                {
+                    files = ApplyFileRegex(files, fileMatch);
+                }
 
                 allItems.AddRange(files);
             }
@@ -86,8 +93,13 @@ namespace RenameRegex
             {
                 string[] dirs = Directory.GetDirectories(
                     Environment.CurrentDirectory,
-                    fileMatch,
+                    fileMatchRegEx ? "*" : fileMatch,
                     recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+
+                if (fileMatchRegEx)
+                {
+                    dirs = ApplyFileRegex(dirs, fileMatch);
+                }
 
                 allItems.AddRange(dirs);
             }
@@ -196,6 +208,29 @@ namespace RenameRegex
         }
 
         /// <summary>
+        /// Matches a list of files/directories to a regular expression
+        /// </summary>
+        /// <param name="list">List of files or directories</param>
+        /// <param name="fileMatch">Regular expression to match</param>
+        /// <returns>List of files or directories that matched</returns>
+        private static string[] ApplyFileRegex(string[] list, string fileMatch)
+        {
+            List<string> matching = new List<string>();
+
+            Regex regex = new Regex(fileMatch);
+
+            for (int i = 0; i < list.Length; i++)
+            {
+                if (regex.IsMatch(list[i]))
+                {
+                    matching.Add(list[i]);
+                }
+            }
+
+            return matching.ToArray();
+        }
+
+        /// <summary>
         /// Gets the program arguments
         /// </summary>
         /// <param name="args">Command-line arguments</param>
@@ -207,6 +242,7 @@ namespace RenameRegex
         /// <param name="force">Whether or not to force overwrites</param>
         /// <param name="preserveExt">Whether or not to preserve file extensions</param>
         /// <param name="includeMask">Whether to include directories, files or both</param>
+        /// <param name="fileMatchRegEx">Whether to use a RegEx for the file match.  If false, Windows glob patterns are used.</param>
         /// <returns>True if argument parsing was successful</returns>
         private static bool GetArguments(
             string[] args,
@@ -218,7 +254,8 @@ namespace RenameRegex
             out bool caseInsensitive,
             out bool force,
             out bool preserveExt,
-            out int  includeMask)
+            out int  includeMask,
+            out bool fileMatchRegEx)
         {
             // defaults
             fileMatch   = String.Empty;
@@ -227,12 +264,13 @@ namespace RenameRegex
 
             bool foundNameReplace = false;
 
-            pretend     = false;
-            recursive   = false;
-            force       = false;
+            pretend         = false;
+            recursive       = false;
+            force           = false;
             caseInsensitive = false;
-            preserveExt = false;
-            includeMask = 0;
+            preserveExt     = false;
+            includeMask     = 0;
+            fileMatchRegEx  = false;
 
             // check for all arguments
             if (args == null || args.Length < 3)
@@ -279,6 +317,10 @@ namespace RenameRegex
                 {
                     includeMask |= IncludeDirs;
                 }
+                else if (args[i].Equals("/fr", StringComparison.OrdinalIgnoreCase))
+                {
+                    fileMatchRegEx = true;
+                }
                 else
                 {
                     // if not an option, the rest of the arguments are filename, search, replace
@@ -295,6 +337,19 @@ namespace RenameRegex
                         nameReplace = args[i];
                         foundNameReplace = true;
                     }
+                }
+            }
+
+            if (fileMatchRegEx)
+            {
+                try
+                {
+                    Regex regex = new Regex(fileMatch);
+                }
+                catch (ArgumentException e)
+                {
+                    Console.WriteLine("ERROR: File match is not a regular expression!\n");
+                    return false;
                 }
             }
 
@@ -325,6 +380,7 @@ namespace RenameRegex
             Console.WriteLine(@"    /files: include files (default)");
             Console.WriteLine(@"     /dirs: include directories");
             Console.WriteLine(@"            (default is to include files only, to include both use /files /dirs)");
+            Console.WriteLine(@"       /fr: use regex for file name matching instead of Windows glob matching");
             return;
         }
     }
