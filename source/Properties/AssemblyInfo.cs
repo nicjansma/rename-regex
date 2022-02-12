@@ -1,11 +1,10 @@
 // <copyright file="AssemblyInfo.cs" company="Nic Jansma">
-//  Copyright (c) Nic Jansma 2021 All Right Reserved
+//  Copyright (c) Nic Jansma 2022 All Right Reserved
 // </copyright>
 // <author>Nic Jansma</author>
 // <email>nic@nicj.net</email>
 using System;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
@@ -35,7 +34,7 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.7.0.0")]
-[assembly: AssemblyFileVersion("1.7.0.0")]
+[assembly: AssemblyVersion("1.8.0.0")]
+[assembly: AssemblyFileVersion("1.8.0.0")]
 
 [assembly: CLSCompliant(true)]
